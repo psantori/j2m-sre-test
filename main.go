@@ -9,6 +9,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+func greet(n int64) string {
+	return fmt.Sprintf("Hello, visitor number %d!", n)
+}
+
 func main() {
 
 	redisdb := redis.NewClient(&redis.Options{
@@ -22,7 +26,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		return c.SendString(fmt.Sprintf("Hello, visitor number %d!", result))
+		return c.SendString(greet(result))
 	})
 
 	log.Fatal(app.Listen(os.Getenv("SERVICE_ADDR")))

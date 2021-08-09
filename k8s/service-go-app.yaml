@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: j2m-sre-test
+  namespace: j2m-sre-test
+  labels:
+    app: j2m-sre-test
+spec:
+  ports:
+  - port: 8080
+    name: http-port
+  clusterIP: None
+  selector:
+    app: j2m-sre-test
+  type: ClusterIP

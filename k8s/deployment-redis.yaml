@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-go
+  namespace: j2m-sre-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-go
+  template:
+    metadata:
+      labels:
+        app: redis-go
+    spec:
+      containers:
+      - name: redis-go
+        image: docker.io/library/redis:alpine
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          limits:
+            cpu: '300m'
+            memory: 300Mi
+          requests:
+              cpu: '100m'
+              memory: 50Mi

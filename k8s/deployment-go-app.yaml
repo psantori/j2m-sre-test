@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: j2m-sre-test
+  namespace: j2m-sre-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: j2m-sre-test
+  template:
+    metadata:
+      labels:
+        app: j2m-sre-test
+    spec:
+      containers:
+      - name: j2m-sre-test
+        image: registry.gitlab.com/betejb/j2m-sre-test
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8080
+          name: http-port
+        env:
+          - name: REDIS_URL
+            value: redis-go.j2m-sre-test.svc
+        resources:
+          limits:
+            cpu: '100m'
+            memory: 100Mi
+          requests:
+              cpu: '100m'
+              memory: 50Mi
+      imagePullSecrets:
+      - name: regcred

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-go
+  namespace: j2m-sre-test
+  labels:
+    app: redis-go
+spec:
+  ports:
+  - port: 6379
+    name: redis
+  clusterIP: None
+  selector:
+    app: redis-go
+  type: ClusterIP

@@ -28,7 +28,7 @@ func main() {
 		}
 		return c.SendString(greet(result))
 	})
-
+	app.Listen(":8080")
 	log.Fatal(app.Listen(os.Getenv("SERVICE_ADDR")))
 
 }

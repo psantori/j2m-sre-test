@@ -1,0 +1,22 @@
+version: '3'
+services:
+  j2m-test:    
+   image: j2m-test
+   container_name: j2m-test 
+   environment:
+    REDIS_URL: redis:6379
+   restart: always   
+   ports:
+     - "8080:8080"
+   depends_on:
+     - redis
+   networks: 
+      - compose
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    networks: 
+      - compose    
+networks:
+    compose:

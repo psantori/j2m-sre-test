@@ -2,31 +2,32 @@
 
 ## Application
 
-I slightly modified the application so Fiber will always listen to a fixed port (8080 in the example).
+I slightly modified the application so Fiber will always listen to a fixed port (8080 in the example). This will allow mapping this port as teh container port for the next steps.
 
 ## Dockerize
 
 Being the first time when i worked with a Go application I relied on Docker documentation to prepare the Dockerfile. I used the multistaged build as the resulting image was much smaller in this case.
 <https://docs.docker.com/language/golang/build-images/>
 
-To obtain the image run teh following command after changing dir to `j2m-sre-test`:
+To obtain the image run the following command after changing dir to `j2m-sre-test` so the code and the Docker file will be automatically picked up:
 `docker build -t j2m-test .`
 
 ## Docker compose
 
-In order to test the application I created a docker-compose.yml file which spins two containers, one obtained from our application and the second one using the redis:alpine image.
+In order to test the application I created a docker-compose.yaml file which spins two containers, one obtained from our application and the second one using the redis:alpine image.
 The REDIS_URL is passed as an environment variable.
+How to test:
 
-- Start:
+- Build the Docker image as per the previous step and hanging dir to `j2m-sre-test`
+- Start the docker compose:
 `docker compose up -d`
 - Open localhost:8080 in a browser, refresh a few times to see the incrementing of the counter.
-- Stop:
+- Stop the containers:
 `docker compose down`
 
 ## Registry
 
-I've built and published the image to the GitLab registry using the following commands.
-Normally a PAT (personal access token) would be preffered instead of user and password considering that one such PAT can be used for CI/CD pipelines as well.
+I've manually built and published the image to the GitLab registry using the following commands.
 
 ```bash
 $ docker login registry.gitlab.com
@@ -55,4 +56,20 @@ I created two deployments one for redis and one for our Go application (a simple
 The ingress will route requests received at `http://j2m-sre-test.go.dev` (implicit port HTTP 80) to the `j2m-sre-test` service.
 Our Go container will connect to redis via the dedicated service `redis-go`
 
-We assume a secret (`regcred`) is created to allow the download of images from GitLab registry. It should contain the PAT mentioned above.
+We assume a secret (`regcred`) is created to allow the download of images from GitLab registry.
+If the CI is also GitLab instead of the secret some implicit pipeline variables should be available. 
+
+## CICD
+
+The GitLab Pipeline is created via `.gitlab-ci.yml`
+It covers the following stages:
+
+- test
+- build
+- docker-image
+
+  The first stage `test` runs a few standard Go tests.
+  Next is the build stage where the Go code is built and an artefact is generated.
+  These first two stages are insipred pretty much from the Gitlab template as as discussed i did not have prior experience with Go and GitLab pipelines.
+
+  Finally I did some researchg and added a 3rd stage in which I've used the Docker in Docker (dind) to buiild the docker image and publish it to the Gitlab registry as the manual solution presented above is not really fit for a CICD environment.
